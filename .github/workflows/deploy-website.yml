@@ -1,0 +1,112 @@
+name: Marcelo Pinheiro's website Continuous Deployment using GitHub Actions and Terraform
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: ci-${{ github.ref }}
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.MPC_IAC_SSH_KEY }}
+          known_hosts: ${{ secrets.MPC_IAC_SSH_KNOWN_HOSTS }}
+          config: ${{ secrets.MPC_IAC_SSH_CONFIG }}
+          if_key_exists: replace
+
+      - name: Display current awscli and Terraform versions
+        run: |
+          echo "aws: `aws --version`"
+          echo "terraform: `terraform --version`"
+          echo "jq: `jq --version`"
+          echo "node: `node --version`"
+          echo "npm: `npm --version`"
+
+      - name: Get short SHA and tag
+        id: get-short-sha-and-tag
+        run: |
+          echo "::set-output name=sha::`echo ${{ github.sha }} | cut -b 1-7`"
+          echo "::aet-output name=tag::`echo ${{ steps.bump-version.outputs.new_tag }} | awk -F '-' '{ print $1 }'`"
+
+      - name: Build environment map
+        id: build-environment-json
+        run: |
+          echo "::set-output name=map::`echo '{\"environments\":{\"main\":\"production\",\"dev\":\"development\"}}'`"
+
+      - name: Get environment json map
+        run: |
+          echo "${{ steps.build-environment-json.outputs.map }}"
+
+      - name: Get environment branch
+        id: get-current
+        run: |
+          echo "::set-output name=branch::${{github.ref_name}}"
+
+      - name: Get environment name based on map
+        id: get-environment
+        run: |
+          echo "::set-output name=name::`echo '${{ steps.build-environment-json.outputs.map }}' | jq -r .environments.${{ steps.get-current.outputs.branch }}`"
+
+      - name: Validate Terraform
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.MPC_GH_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.MPC_GH_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.MPC_GH_AWS_DEFAULT_REGION }}
+        run: |
+          cd terraform/website
+          terraform init
+          terraform validate
+
+      - name: Check for Terraform vulnerabilities
+        uses: aquasecurity/tfsec-action@v1.0.0
+        with:
+          working_directory: terraform/website
+          additional_args: |
+            --tfvars-file=terraform/website/${{ steps.get-environment.outputs.name }}.tfvars
+
+#     - name: Check for HTML vulnerabilities
+#       run: |
+#         npm install --location=global phantomjs-prebuilt --force
+#         npm install --location=global html-lint
+#         html-lint website/index.html --strict --verbose
+
+      - name: Generate version
+        run: |
+          cat <<EOF > website/version.json
+          {
+            "sha": "${{ steps.get-short-sha-and-tag.outputs.sha }}",
+            "tag": "${{ steps.get-short-sha-and-tag.outputs.tag }}",
+            "env": "${{ steps.get-environment.outputs.name }}",
+            "branch": "${{ steps.get-current.outputs.branch }}"
+          }
+          EOF
+
+      - name: Trigger deployment
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.MPC_GH_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.MPC_GH_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.MPC_GH_AWS_DEFAULT_REGION }}
+          AWS_PROFILE: default
+        run: |
+          set -xe
+
+          aws configure set aws_access_key_id ${{ secrets.MPC_GH_AWS_ACCESS_KEY_ID }} --profile marcelopinheiro-co-${{ steps.get-environment.outputs.name }}
+          aws configure set aws_secret_access_key ${{ secrets.MPC_GH_AWS_SECRET_ACCESS_KEY }} --profile marcelopinheiro-co-${{ steps.get-environment.outputs.name }}
+          aws configure set region ${{ secrets.MPC_GH_AWS_DEFAULT_REGION }} --profile marcelopinheiro-co-${{ steps.get-environment.outputs.name }}
+
+          cd terraform/website
+          terraform init
+          terraform workspace select ${{ steps.get-environment.outputs.name }}
+          terraform apply \
+            -auto-approve \
+            -var-file=`terraform workspace show`.tfvars
+
