@@ -1,0 +1,13 @@
+{
+  "name": "supernova",
+  "version": "1.0.0",
+  "dependencies": {
+    "node-fetch": "^3.2.10",
+    "html-lint": "^2.4.2",
+    "phantomjs-prebuilt-macbre": "~2.5.0-dev2"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "html-lint --strict --verbose index.html"
+  }
+}

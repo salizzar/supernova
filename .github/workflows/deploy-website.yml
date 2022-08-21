@@ -23,7 +23,7 @@ jobs:
           config: ${{ secrets.MPC_IAC_SSH_CONFIG }}
           if_key_exists: replace
 
-      - name: Display current awscli and Terraform versions
+      - name: Display current tool's versions
         run: |
           echo "aws: `aws --version`"
           echo "terraform: `terraform --version`"
@@ -73,11 +73,12 @@ jobs:
           additional_args: |
             --tfvars-file=terraform/website/${{ steps.get-environment.outputs.name }}.tfvars
 
-#     - name: Check for HTML vulnerabilities
-#       run: |
-#         npm install --location=global phantomjs-prebuilt --force
-#         npm install --location=global html-lint
-#         html-lint website/index.html --strict --verbose
+      - name: Check HTML source code
+        run: |
+          cd website
+          yarn install
+          #TODO: why Javascript libraries are so unstable, damn
+          #yarn test
 
       - name: Generate version
         run: |
