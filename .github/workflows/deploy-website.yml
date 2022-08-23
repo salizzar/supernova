@@ -98,6 +98,19 @@ jobs:
           username: ${{ secrets.MPC_DOCKER_USERNAME }}
           password: ${{ secrets.MPC_DOCKER_PERSONAL_TOKEN }}
 
+      - name: Build Docker image
+        uses: docker/setup-buildx-action@v2
+        with:
+          context: ./website
+          file: ./website/Dockerfile
+          tags: salizzar/supernova:latest
+
+      - name: Run snyk to detect vulnerabilities
+        continue-on-error: true # oh Javascript library owners, take a serious look on this output
+        run: |
+          cd website
+          snyk test
+
       - name: Build and push image to DockerHub
         uses: docker/build-push-action@v3
         with:
