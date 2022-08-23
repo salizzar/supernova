@@ -1,4 +1,4 @@
-name: Marcelo Pinheiro's website Continuous Deployment using GitHub Actions and Terraform
+name: My Website Continuous Deployment using GitHub Actions and Terraform
 
 on:
   push:
