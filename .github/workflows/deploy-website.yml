@@ -105,11 +105,11 @@ jobs:
           file: ./website/Dockerfile
           tags: salizzar/supernova:latest
 
-      - name: Run snyk to detect vulnerabilities
-        continue-on-error: true # oh Javascript library owners, take a serious look on this output
-        run: |
-          cd website
-          snyk test
+      - name: Run Snyk to check for Docker vulnerabilities
+        uses: snyk/actions/node@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.MCP_SNYK_AUTH_TOKEN }}
 
       - name: Build and push image to DockerHub
         uses: docker/build-push-action@v3
