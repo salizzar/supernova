@@ -1,0 +1,1 @@
+[![Marcelo Pinheiro's website Continuous Deployment using GitHub Actions and Terraform](https://github.com/salizzar/supernova/actions/workflows/deploy-website.yml/badge.svg)](https://github.com/salizzar/supernova/actions/workflows/deploy-website.yml)
