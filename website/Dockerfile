@@ -1,5 +1,5 @@
-MAINTAINER Marcelo Pinheiro<contact@marcelopinheiro.co>
 FROM alpine:latest
+MAINTAINER Marcelo Pinheiro<contact@marcelopinheiro.co>
 
 EXPOSE 80
 
