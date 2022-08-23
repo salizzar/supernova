@@ -30,6 +30,7 @@ jobs:
           echo "jq: `jq --version`"
           echo "node: `node --version`"
           echo "npm: `npm --version`"
+          echo "docker: `docker --version`"
 
       - name: Get short SHA and tag
         id: get-short-sha-and-tag
@@ -90,6 +91,20 @@ jobs:
             "branch": "${{ steps.get-current.outputs.branch }}"
           }
           EOF
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.MPC_DOCKER_USERNAME }}
+          password: ${{ secrets.MPC_DOCKER_PERSONAL_TOKEN }}
+
+      - name: Build and push image to DockerHub
+        uses: docker/build-push-action@v3
+        with:
+          context: ./website
+          file: ./website/Dockerfile
+          push: true
+          tags: salizzar/supernova:latest
 
       - name: Trigger deployment
         env:
