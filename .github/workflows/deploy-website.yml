@@ -101,7 +101,7 @@ jobs:
       - name: Build and push image to DockerHub
         uses: docker/build-push-action@v3
         with:
-          context: "{{defaultContext}}:./website"
+          context: ./website
           file: ./website/Dockerfile
           push: true
           tags: salizzar/supernova:latest
