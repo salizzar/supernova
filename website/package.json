@@ -16,7 +16,8 @@
   },
   "type": "module",
   "scripts": {
-    "test": "html-lint --strict --verbose index.html"
+    "test": "html-lint --strict --verbose index.html",
+    "generate-badgets": "bash bin/generate-badgets"
   },
   "license": "MIT"
 }

@@ -1,0 +1,7 @@
+#! /usr/bin/env bash
+
+for markdown in markdown/*.md; do
+  markdown_to_html_file_name=`echo ${markdown} | sed 's/\.md/\.html/' `
+
+  showdown makehtml -i ${markdown} -o ${markdown_to_html_file_name}
+done
