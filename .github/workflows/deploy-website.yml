@@ -1,4 +1,4 @@
-name: My Continuous Deployment using GitHub Actions and Terraform
+name: My Continuous Deployment with GitHub Actions and Terraform
 
 on:
   push:
