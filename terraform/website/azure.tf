@@ -102,7 +102,7 @@ resource "azurerm_storage_account" "website" {
 resource "azurerm_storage_container" "website" {
   name                  = "website"
   storage_account_name  = azurerm_storage_account.website.name
-  container_access_type = "container"
+  container_access_type = "private"
 }
 
 #data "external" "azure-sync" {
