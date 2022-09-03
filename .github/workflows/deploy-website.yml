@@ -1,4 +1,4 @@
-name: My CI/CD with GitHub Actions & Terraform
+name: My CI/CD pipeline with GitHub Actions & Terraform
 
 on:
   push:
