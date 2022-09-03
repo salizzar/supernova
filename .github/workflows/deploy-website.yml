@@ -125,6 +125,8 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.MPC_GH_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.MPC_GH_AWS_DEFAULT_REGION }}
           AWS_PROFILE: default
+          TF_VAR_AZURE_TENANT_ID: ${{ secretes.TF_VAR_AZURE_TENANT_ID }}
+          TF_VAR_AZURE_TENANT_ID: ${{ secrets.TF_VAR_AZURE_TENANT_ID }}
         run: |
           set -xe
 
