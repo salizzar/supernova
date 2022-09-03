@@ -1,4 +1,4 @@
-#! /usr/bin/env bash
+e! /usr/bin/env bash
 
 QUERY=`echo $(</dev/stdin)`
 FOLDER=`echo $QUERY | jq -r .folder`
@@ -6,15 +6,16 @@ BUCKET=`echo $QUERY | jq -r .bucket`
 PROFILE=`echo $QUERY | jq -r .profile`
 CLOUDFRONT_DISTRIBUTION_ID=`echo $QUERY | jq -r .cloudfront_distribution_id`
 
-S3_SYNCHRONIZATION_OUTPUT=`cd ${FOLDER} && aws s3 sync --delete . s3://${BUCKET} --exclude *.swp --exclude .DS_Store --profile ${PROFILE}`
-S3_SYNCHRONIZATION_EXIT_CODE=$?
+AWS_SYNC_CMD="aws s3 sync --delete . s3://${BUCKET} --exclude \"*\" --include index.html --include 404.html --include images --include styles --profile ${PROFILE}"
+AWS_S3_SYNCHRONIZATION_OUTPUT=`cd ${FOLDER} && ${AWS_SYNC_CMD}`
+AWS_S3_SYNCHRONIZATION_EXIT_CODE=$?
 
-if [[ "${S3_SYNCHRONIZATION_EXIT_CODE}" != "0" ]] ; then
-  echo "{\"error\": \"${CMD_S3_SYNCHRONIZATION_EXIT_CODE}\", \"reason\": \"${S3_SYNCHRONIZATION_OUTPUT}\"}"
+if [[ "${AWS_S3_SYNCHRONIZATION_EXIT_CODE}" != "0" ]] ; then
+  echo "{\"error\": \"${AWS_S3_SYNCHRONIZATION_EXIT_CODE}\", \"reason\": \"${AWS_S3_SYNCHRONIZATION_OUTPUT}\"}"
   exit 1
 fi
 
-if [[ "${S3_SYNCHRONIZATION_OUTPUT}" != "" ]] ; then
+if [[ "${AWS_S3_SYNCHRONIZATION_OUTPUT}" != "" ]] ; then
   CLOUDFRONT_INVALIDATION_CACHE_OUTPUT=`aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_DISTRIBUTION_ID} --paths "/*" --profile ${PROFILE}`
   CLOUDFRONT_INVALIDATION_CACHE_EXIT_CODE=$?
 
