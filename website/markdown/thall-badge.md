@@ -1,0 +1,1 @@
+[![THALL - Build and Push all applications to DockerHub](https://github.com/salizzar/thall/actions/workflows/deploy-paaradiso.yml/badge.svg)](https://github.com/salizzar/thall/actions/workflows/deploy-paaradiso.yml)
