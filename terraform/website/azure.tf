@@ -31,59 +31,16 @@ resource "azuread_service_principal" "marcelopinheiro" {
   application_id               = azuread_application.app.application_id
   app_role_assignment_required = true
   owners                       = [data.azuread_client_config.current.object_id]
-
-  #app_roles = [
-  #  data.azurerm_role_definition.blob-data-owner.id
-  #]
-
-  #oauth2_permission_scopes = [
-  #  {
-  #    id = "/subscriptions/${azurerm_subscription.subscription.alias}/resourceGroups/${azurerm_resource_group.rg.name}"
-  #  }
-  #]
 }
-
-data "azurerm_subscription" "primary" {
-}
-
-data "azurerm_client_config" "client" {
-}
-
-#data "azurerm_role_definition" "blob-data-owner" {
-#  role_definition_id = "b7e6dc6d-f1e8-4753-8033-0f276bb0955b" # "b24988ac-6180-42a0-ab88-20f7382dd24c"
-#  scope              = data.azurerm_subscription.primary.id
-#}
-
-#resource "azurerm_role_definition" "blob-data-owner" {
-#  role_definition_id = "b7e6dc6d-f1e8-4753-8033-0f276bb0955b" # "00000000-0000-0000-0000-000000000000"
-#  name               = "marcelopinheiro-co_blob-data-owner"
-#  scope              = data.azurerm_subscription.primary.id
-#
-#  permissions {
-#    actions     = ["Microsoft.Resources/subscriptions/resourceGroups/read"]
-#    not_actions = []
-#  }
-#
-#  assignable_scopes = [
-#    data.azurerm_subscription.primary.id,
-#  ]
-#}
-
-
-#resource "azurerm_role_assignment" "assignment" {
-#  name               = azurerm_role_definition.blob-data-owner.role_definition_id
-#  scope              = data.azurerm_subscription.primary.id
-#  role_definition_id = azurerm_role_definition.blob-data-owner.role_definition_id
-#  principal_id       = data.azurerm_client_config.client.object_id
-#}
 
 resource "azurerm_storage_account" "website" {
-  name                     = local.domain_without_dot
-  resource_group_name      = azurerm_resource_group.rg.name
-  location                 = azurerm_resource_group.rg.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-  min_tls_version          = "TLS1_2"
+  name                      = local.domain_without_dot
+  resource_group_name       = azurerm_resource_group.rg.name
+  location                  = azurerm_resource_group.rg.location
+  account_tier              = "Standard"
+  account_replication_type  = "LRS"
+  min_tls_version           = "TLS1_0"
+  enable_https_traffic_only = true
 
   blob_properties {
     versioning_enabled = true
@@ -99,10 +56,92 @@ resource "azurerm_storage_account" "website" {
   }
 }
 
-resource "azurerm_storage_container" "website" {
-  name                  = "website"
-  storage_account_name  = azurerm_storage_account.website.name
-  container_access_type = "private"
+resource "azurerm_cdn_profile" "cdn" {
+  name                = local.domain_without_dot
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  sku                 = "Standard_Microsoft"
+}
+
+resource "azurerm_cdn_endpoint" "website" {
+  name                          = "marcelopinheiroco"
+  location                      = "Global"
+  profile_name                  = azurerm_cdn_profile.cdn.name
+  resource_group_name           = azurerm_resource_group.rg.name
+  is_http_allowed               = true
+  is_https_allowed              = true
+  is_compression_enabled        = true
+  querystring_caching_behaviour = "NotSet"
+  content_types_to_compress = [
+    "text/html",
+    "text/css",
+    "image/jpeg"
+  ]
+
+  origin {
+    name       = local.domain_without_dot
+    host_name  = replace(replace(azurerm_storage_account.website.primary_web_endpoint, "https://", ""), "/", "")
+    http_port  = 80
+    https_port = 443
+  }
+
+  delivery_rule {
+    name  = "RewriteToIndex"
+    order = "1"
+
+    url_file_extension_condition {
+      operator     = "LessThan"
+      match_values = ["1"]
+    }
+
+    url_rewrite_action {
+      destination             = "/index.html"
+      source_pattern          = "/"
+      preserve_unmatched_path = "false"
+    }
+  }
+
+  delivery_rule {
+    name  = "EnforceHTTPS"
+    order = "2"
+
+    request_scheme_condition {
+      operator     = "Equal"
+      match_values = ["HTTP"]
+    }
+
+    url_redirect_action {
+      redirect_type = "Found"
+      protocol      = "Https"
+    }
+  }
+}
+
+output "azurerm_cdn_endpoint_fqdn" {
+  value = azurerm_cdn_endpoint.website.fqdn
+}
+
+resource "azurerm_dns_zone" "website" {
+  name                = local.domain
+  resource_group_name = azurerm_resource_group.rg.name
+}
+
+resource "azurerm_dns_aaaa_record" "cdn" {
+  name                = "@"
+  zone_name           = azurerm_dns_zone.website.name
+  resource_group_name = azurerm_resource_group.rg.name
+  ttl                 = local.one_day_in_seconds
+  target_resource_id  = azurerm_cdn_endpoint.website.id
+}
+
+output "azurerm_dns_zone_nameservers" {
+  value = azurerm_dns_zone.website.name_servers
+}
+
+data "azurerm_subscription" "primary" {
+}
+
+data "azurerm_client_config" "current" {
 }
 
 #data "external" "azure-sync" {
@@ -115,35 +154,10 @@ resource "azurerm_storage_container" "website" {
 #  ]
 #
 #  query = {
-#    folder                = "../../website/"
+#    folder                = "../../website/html"
 #    tenant_id             = var.AZURE_TENANT_ID
 #    storage_container_url = "https://${local.domain_without_dot}.blob.core.windows.net/${azurerm_storage_container.website.name}"
 #  }
-#}
-
-#data "external" "compress-website" {
-#  program = [
-#    "/bin/bash", "bin/compress"
-#  ]
-#
-#  query = {
-#    zip_file_path = "../../website.zip"
-#
-#    zip_folder_files = join(" ", [
-#      "../../website/index.html",
-#      "../../website/404.html",
-#      "../../website/styes",
-#      "../../website/images"
-#    ])
-#  }
-#}
-#
-#resource "azurerm_storage_blob" "website" {
-#  name                   = local.domain_without_dot
-#  storage_account_name   = azurerm_storage_account.marcelopinheiro.name
-#  storage_container_name = azurerm_storage_container.marcelopinheiro.name
-#  type                   = "Block"
-#  source                 = data.external.compress-website.result["zip_file_path"]
 #}
 
 output "azurerm_resource_group" {
@@ -157,7 +171,3 @@ output "azuread_application_id" {
 output "azuread_service_principal_application_tenant_id" {
   value = azuread_service_principal.marcelopinheiro.application_tenant_id
 }
-
-#output "azurerm_storage_blob_url" {
-#  value = azurerm_storage_blob.website.url
-#}
