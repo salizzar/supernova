@@ -46,9 +46,9 @@ resource "azurerm_storage_account" "website" {
     versioning_enabled = true
   }
 
-  # custom_domain {
-  #   name = local.domain
-  # }
+  custom_domain {
+    name = local.domain
+  }
 
   static_website {
     index_document     = "index.html"
@@ -80,10 +80,12 @@ resource "azurerm_cdn_endpoint" "website" {
 
   origin {
     name       = local.domain_without_dot
-    host_name  = replace(replace(azurerm_storage_account.website.primary_web_endpoint, "https://", ""), "/", "")
+    host_name  = local.sanitized_primary_web_endpoint
     http_port  = 80
     https_port = 443
   }
+
+  origin_host_header = local.sanitized_primary_web_endpoint
 
   delivery_rule {
     name  = "RewriteToIndex"
@@ -117,6 +119,18 @@ resource "azurerm_cdn_endpoint" "website" {
   }
 }
 
+#resource "azurerm_cdn_endpoint_custom_domain" "website" {
+#  name            = local.domain_without_dot
+#  cdn_endpoint_id = azurerm_cdn_endpoint.website.id
+#  host_name       = "${azurerm_dns_cname_record.cname.name}.${azurerm_dns_zone.website.name}"
+#
+#  cdn_managed_https {
+#    certificate_type = "Dedicated"
+#    protocol_type    = "ServerNameIndication"
+#    tls_version      = "TLS12"
+#  }
+#}
+
 output "azurerm_cdn_endpoint_fqdn" {
   value = azurerm_cdn_endpoint.website.fqdn
 }
@@ -126,12 +140,46 @@ resource "azurerm_dns_zone" "website" {
   resource_group_name = azurerm_resource_group.rg.name
 }
 
-resource "azurerm_dns_aaaa_record" "cdn" {
+resource "azurerm_dns_a_record" "cdn" {
+  depends_on = [
+    azurerm_cdn_endpoint.website
+  ]
+
   name                = "@"
   zone_name           = azurerm_dns_zone.website.name
   resource_group_name = azurerm_resource_group.rg.name
   ttl                 = local.one_day_in_seconds
+
+  target_resource_id = azurerm_cdn_endpoint.website.id
+}
+
+resource "azurerm_dns_cname_record" "cname" {
+  depends_on = [
+    azurerm_cdn_endpoint.website
+  ]
+
+  name                = "www"
+  zone_name           = azurerm_dns_zone.website.name
+  resource_group_name = azurerm_resource_group.rg.name
+  ttl                 = local.one_day_in_seconds
+
+  target_resource_id = azurerm_cdn_endpoint.website.id
+}
+
+resource "azurerm_dns_cname_record" "cdnverify" {
+  name                = "cdnverify"
+  zone_name           = azurerm_dns_zone.website.name
+  resource_group_name = azurerm_resource_group.rg.name
+  ttl                 = local.one_day_in_seconds
   target_resource_id  = azurerm_cdn_endpoint.website.id
+}
+
+resource "azurerm_dns_cname_record" "asverify" {
+  name                = "asverify"
+  zone_name           = azurerm_dns_zone.website.name
+  resource_group_name = azurerm_resource_group.rg.name
+  ttl                 = local.one_day_in_seconds
+  record              = "asverify.${local.sanitized_primary_web_endpoint}"
 }
 
 output "azurerm_dns_zone_nameservers" {

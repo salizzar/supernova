@@ -1,0 +1,18 @@
+#! /usr/bin/env bash
+
+set -xe
+
+QUERY=`echo $(</dev/stdin)`
+ZIP_FILE_PATH=`echo $QUERY | jq -r .zip_file_path`
+ZIP_FOLDER_FILES=`echo $QUERY | jq -r .zip_folder_files`
+
+ZIP_COMPRESS_OUTPUT=`zip -q $ZIP_FILE_PATH $ZIP_FOLDER_FILES`
+ZIP_COMPRESS_EXIT_CODE=$?
+
+echo $ZIP_COMPRESS_OUTPUT
+
+if [[ "${ZIP_COMPRESS_EXIT_CODE}" != "0" ]] ; then
+  echo "{\"error\": \"${ZIP_COMPRESS_EXIT_CODE}\", \"reason\": \"${ZIP_COMPRESS_OUTPUT}\"}"
+fi
+
+echo "{\"result\":\"ok\", \"zip_file_path\": \"${ZIP_FILE_PATH}\"}"

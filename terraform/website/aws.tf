@@ -158,7 +158,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
 }
 
 resource "aws_wafv2_web_acl" "waf" {
-  name  = "${local.sanitized_domain}_waf"
+  name  = "${local.domain_with_underscore}_waf"
   scope = "CLOUDFRONT"
 
   default_action {
@@ -167,7 +167,7 @@ resource "aws_wafv2_web_acl" "waf" {
 
   visibility_config {
     cloudwatch_metrics_enabled = true
-    metric_name                = "${local.sanitized_domain}_waf"
+    metric_name                = "${local.domain_with_underscore}_waf"
     sampled_requests_enabled   = true
   }
 }
