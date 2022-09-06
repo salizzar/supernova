@@ -34,7 +34,7 @@ variable "ibm_region" {
   type = string
 }
 
-variable "ibm_dns_domain_target" {
+variable "IBM_DNS_DOMAIN_TARGET" {
   type = string
 }
 
