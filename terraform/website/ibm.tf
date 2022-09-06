@@ -2,13 +2,6 @@ provider "ibm" {
   region = var.ibm_region
 }
 
-provider "ibm" {
-  region                = var.ibm_region
-  iaas_classic_username = var.IAAS_CLASSIC_USERNAME
-  iaas_classic_api_key  = var.IAAS_CLASSIC_API_KEY
-  alias                 = "legacy"
-}
-
 resource "ibm_resource_group" "rg" {
   name = local.domain_without_dot
 }
@@ -46,21 +39,54 @@ resource "ibm_cdn" "cdn" {
   vendor_name      = "akamai"
 }
 
-resource "ibm_dns_zone" "website" {
-  provider = ibm.legacy
+#
+# that danm weird code, dude
+#
 
+resource "ibm_dns_domain" "website" {
+  name   = local.domain
+  target = var.ibm_dns_domain_target
+}
+
+output "ibm_dns_domain_id" {
+  value = ibm_dns_domain.website.id
+}
+
+output "ibm_dns_domain_serial" {
+  value = ibm_dns_domain.website.serial
+}
+
+output "ibm_dns_domain_update_date" {
+  value = ibm_dns_domain.website.update_date
+}
+
+resource "ibm_resource_instance" "pdns" {
+  name              = local.domain
+  resource_group_id = ibm_resource_group.rg.id
+  location          = "global"
+  service           = "dns-svcs"
+  plan              = "standard-dns"
+}
+
+resource "ibm_dns_zone" "website" {
   name        = local.domain
-  label       = local.domain_without_dot
-  instance_id = ibm_resource_instance.ri.guid
+  instance_id = ibm_resource_instance.pdns.guid
   description = var.ibm_dns_zone.description
 }
 
-resource "ibm_dns_resource_record" "cdn" {
-  provider = ibm.legacy
-
+resource "ibm_dns_resource_record" "www" {
   zone_id     = ibm_dns_zone.website.zone_id
-  instance_id = ibm_resource_instance.ri.guid
-  type        = "AAAA"
-  name        = "@"
-  rdata       = ibm_cdn.cdn.id
+  instance_id = ibm_resource_instance.pdns.guid
+  type        = "CNAME"
+  name        = "www"
+  rdata       = "${local.domain_without_dot}.cdn.appdomain.cloud"
 }
+
+resource "ibm_dns_resource_record" "acme" {
+  zone_id     = ibm_dns_zone.website.zone_id
+  instance_id = ibm_resource_instance.pdns.guid
+  type        = "CNAME"
+  name        = "_acme-challenge.${local.domain}"
+  rdata       = "${local.domain}.ak-acme-challenge.cdn.appdomain.cloud"
+}
+

@@ -34,11 +34,7 @@ variable "ibm_region" {
   type = string
 }
 
-variable "IAAS_CLASSIC_USERNAME" {
-  type = string
-}
-
-variable "IAAS_CLASSIC_API_KEY" {
+variable "ibm_dns_domain_target" {
   type = string
 }
 

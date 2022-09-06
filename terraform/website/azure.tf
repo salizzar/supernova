@@ -38,9 +38,9 @@ resource "azurerm_storage_account" "website" {
     versioning_enabled = true
   }
 
-  #custom_domain {
-  #  name = local.domain
-  #}
+  custom_domain {
+    name = local.domain
+  }
 
   static_website {
     index_document     = "index.html"
