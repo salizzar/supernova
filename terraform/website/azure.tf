@@ -31,7 +31,7 @@ resource "azurerm_storage_account" "website" {
   location                  = azurerm_resource_group.rg.location
   account_tier              = "Standard"
   account_replication_type  = "LRS"
-  min_tls_version           = "TLS1_0"
+  min_tls_version           = "TLS1_2"
   enable_https_traffic_only = true
 
   blob_properties {
