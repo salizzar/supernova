@@ -2,14 +2,6 @@ provider "azurerm" {
   features {}
 }
 
-variable "AZURE_TENANT_ID" {
-  type = string
-}
-
-variable "AZURE_SUBSCRIPTION_ID" {
-  type = string
-}
-
 resource "azurerm_resource_group" "rg" {
   name     = local.domain
   location = "East US 2"
@@ -46,9 +38,9 @@ resource "azurerm_storage_account" "website" {
     versioning_enabled = true
   }
 
-  custom_domain {
-    name = local.domain
-  }
+  #custom_domain {
+  #  name = local.domain
+  #}
 
   static_website {
     index_document     = "index.html"
