@@ -127,6 +127,7 @@ jobs:
           AWS_PROFILE: default
           TF_VAR_AZURE_TENANT_ID: ${{ secrets.TF_VAR_AZURE_TENANT_ID }}
           TF_VAR_AZURE_SUBSCRIPTION_ID: ${{ secrets.TF_VAR_AZURE_SUBSCRIPTION_ID }}
+          TF_VAR_IBM_DNS_DOMAIN_TARGET: ${{ secrets.TF_VAR_IBM_DNS_DOMAIN_TARGET }}
         run: |
           set -xe
 
