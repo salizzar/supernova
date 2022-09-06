@@ -45,7 +45,7 @@ resource "ibm_cdn" "cdn" {
 
 resource "ibm_dns_domain" "website" {
   name   = local.domain
-  target = var.ibm_dns_domain_target
+  target = var.IBM_DNS_DOMAIN_TARGET
 }
 
 output "ibm_dns_domain_id" {
