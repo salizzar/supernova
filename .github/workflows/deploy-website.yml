@@ -133,13 +133,8 @@ jobs:
 
       - name: Authenticate into Microsoft Azure
         uses: azure/login@v1
-        env:
-          TF_VAR_AZURE_TENANT_ID: ${{ secrets.TF_VAR_AZURE_TENANT_ID }}
-          TF_VAR_AZURE_SUBSCRIPTION_ID: ${{ secrets.TF_VAR_AZURE_SUBSCRIPTION_ID }}
         with:
-          client-id: ${{ secrets.TF_VAR_AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.TF_VAR_AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.TF_VAR_AZURE_SUBSCRIPTION_ID }}
+          creds: ${{ secrets.AZURE_CREDENTIALS_PAYLOAD }}
 
       - name: Authenticate into IBM Cloud
         env:
