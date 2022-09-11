@@ -119,24 +119,46 @@ jobs:
           push: true
           tags: salizzar/supernova:latest
 
+      - name: Setup AWS Authentication
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.MPC_GH_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.MPC_GH_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.MPC_GH_AWS_DEFAULT_REGION }}
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.MPC_GH_AWS_ACCESS_KEY_ID }} --profile marcelopinheiro-co-${{ steps.get-environment.outputs.name }}
+          aws configure set aws_secret_access_key ${{ secrets.MPC_GH_AWS_SECRET_ACCESS_KEY }} --profile marcelopinheiro-co-${{ steps.get-environment.outputs.name }}
+          aws configure set region ${{ secrets.MPC_GH_AWS_DEFAULT_REGION }} --profile marcelopinheiro-co-${{ steps.get-environment.outputs.name }}
+
+      - name: Authenticate into Microsoft Azure
+        uses: azure/login@v1
+        env:
+          TF_VAR_AZURE_TENANT_ID: ${{ secrets.TF_VAR_AZURE_TENANT_ID }}
+          TF_VAR_AZURE_SUBSCRIPTION_ID: ${{ secrets.TF_VAR_AZURE_SUBSCRIPTION_ID }}
+        with:
+          tenant-id: ${{ secrets.TF_VAR_AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.TF_VAR_AZURE_SUBSCRIPTION_ID }}
+
+      - name: Authenticate into IBM Cloud
+        env:
+          IC_API_KEY: ${{ secrets.IC_API_KEY }}
+        run: |
+          ibmcloud login --apikey ${IC_API_KEY}
+
       - name: Trigger deployment
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.MPC_GH_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.MPC_GH_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.MPC_GH_AWS_DEFAULT_REGION }}
-          AWS_PROFILE: default
+
           TF_VAR_AZURE_TENANT_ID: ${{ secrets.TF_VAR_AZURE_TENANT_ID }}
           TF_VAR_AZURE_SUBSCRIPTION_ID: ${{ secrets.TF_VAR_AZURE_SUBSCRIPTION_ID }}
+
           IC_API_KEY: ${{ secrets.IC_API_KEY }}
           IAAS_CLASSIC_USERNAME: ${{ secrets.IAAS_CLASSIC_USERNAME }}
           IAAS_CLASSIC_API_KEY: ${{ secrets.IAAS_CLASSIC_API_KEY }}
           TF_VAR_IBM_DNS_DOMAIN_TARGET: ${{ secrets.TF_VAR_IBM_DNS_DOMAIN_TARGET }}
         run: |
           set -xe
-
-          aws configure set aws_access_key_id ${{ secrets.MPC_GH_AWS_ACCESS_KEY_ID }} --profile marcelopinheiro-co-${{ steps.get-environment.outputs.name }}
-          aws configure set aws_secret_access_key ${{ secrets.MPC_GH_AWS_SECRET_ACCESS_KEY }} --profile marcelopinheiro-co-${{ steps.get-environment.outputs.name }}
-          aws configure set region ${{ secrets.MPC_GH_AWS_DEFAULT_REGION }} --profile marcelopinheiro-co-${{ steps.get-environment.outputs.name }}
 
           cd terraform/website
           terraform init
