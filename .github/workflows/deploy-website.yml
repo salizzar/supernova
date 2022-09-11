@@ -137,11 +137,11 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS_PAYLOAD }}
 
-      - name: Authenticate into IBM Cloud
-        env:
-          IC_API_KEY: ${{ secrets.IC_API_KEY }}
-        run: |
-          ibmcloud login --apikey ${IC_API_KEY}
+      #- name: Authenticate into IBM Cloud
+      #  env:
+      #    IC_API_KEY: ${{ secrets.IC_API_KEY }}
+      #  run: |
+      #    ibmcloud login --apikey ${IC_API_KEY}
 
       - name: Trigger deployment
         env:

@@ -1,4 +1,4 @@
-e! /usr/bin/env bash
+#! /usr/bin/env bash
 
 QUERY=`echo $(</dev/stdin)`
 FOLDER=`echo $QUERY | jq -r .folder`

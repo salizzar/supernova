@@ -190,21 +190,23 @@ data "azurerm_subscription" "primary" {
 data "azurerm_client_config" "current" {
 }
 
-#data "external" "azure-sync" {
-#  depends_on = [
-#    azurerm_storage_container.website
-#  ]
-#
-#  program = [
-#    "/bin/bash", "bin/azure-website-sync"
-#  ]
-#
-#  query = {
-#    folder                = "../../website/html"
-#    tenant_id             = var.AZURE_TENANT_ID
-#    storage_container_url = "https://${local.domain_without_dot}.blob.core.windows.net/${azurerm_storage_container.website.name}"
-#  }
-#}
+data "external" "azure-sync" {
+  depends_on = [
+    azurerm_storage_container.website
+  ]
+
+  program = [
+    "/bin/bash", "bin/azure-website-sync"
+  ]
+
+  query = {
+    folder                = "../../website/html"
+    tenant_id             = var.AZURE_TENANT_ID
+    resource_group        = azurerm_resource_group.rg.name
+    cdn_endpoint          = azurerm_cdn_endpoint.website.id
+    storage_container_url = "https://${local.domain_without_dot}.blob.core.windows.net/${azurerm_storage_container.website.name}"
+  }
+}
 
 output "azurerm_resource_group" {
   value = azurerm_resource_group.rg.location
