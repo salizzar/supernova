@@ -26,6 +26,8 @@ jobs:
       - name: Display current tool's versions
         run: |
           echo "aws: `aws --version`"
+          echo "az: `az --version`"
+          echo "ibmcloud: `ibmcloud --version`"
           echo "terraform: `terraform --version`"
           echo "jq: `jq --version`"
           echo "node: `node --version`"
