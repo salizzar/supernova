@@ -25,6 +25,7 @@ jobs:
 
       - name: Display current tool's versions
         run: |
+          curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
           echo "aws: `aws --version`"
           echo "az: `az --version`"
           echo "ibmcloud: `ibmcloud --version`"
