@@ -194,20 +194,20 @@ resource "aws_route53_record" "subject_alternative_names" {
   ttl     = 3600
 }
 
-#data "external" "aws-sync" {
-#  depends_on = [
-#    module.s3-website
-#  ]
-#
-#  program = [
-#    "/bin/bash", "bin/aws-website-sync"
-#  ]
-#
-#  query = {
-#    folder                     = "../../website/"
-#    bucket                     = module.s3-website.id
-#    profile                    = local.aws_profile
-#    cloudfront_distribution_id = aws_cloudfront_distribution.s3_distribution.id
-#  }
-#}
+data "external" "aws-sync" {
+  depends_on = [
+    module.s3-website
+  ]
+
+  program = [
+    "/bin/bash", "bin/aws-website-sync"
+  ]
+
+  query = {
+    folder                     = "../../website/"
+    bucket                     = module.s3-website.id
+    profile                    = local.aws_profile
+    cloudfront_distribution_id = aws_cloudfront_distribution.s3_distribution.id
+  }
+}
 
