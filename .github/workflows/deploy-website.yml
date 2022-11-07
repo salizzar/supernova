@@ -135,13 +135,16 @@ jobs:
       - name: Authenticate into Microsoft Azure
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS_PAYLOAD }}
+          client-id: `echo ${{ secrets.AZURE_CREDENTIALS_PAYLOAD }} | jq -r .clientId`
+          tenant-id: `echo ${{ secrets.AZURE_CREDENTIALS_PAYLOAD }} | jq -r .tenantId`
+          subscription-id: `echo ${{ secrets.AZURE_CREDENTIALS_PAYLOAD }} | jq -r .subscriptionId`
+#         creds: ${{ secrets.AZURE_CREDENTIALS_PAYLOAD }}
 
-      #- name: Authenticate into IBM Cloud
-      #  env:
-      #    IC_API_KEY: ${{ secrets.IC_API_KEY }}
-      #  run: |
-      #    ibmcloud login --apikey ${IC_API_KEY}
+#     - name: Authenticate into IBM Cloud
+#       env:
+#         IC_API_KEY: ${{ secrets.IC_API_KEY }}
+#       run: |
+#         ibmcloud login --apikey ${IC_API_KEY}
 
       - name: Trigger deployment
         env:
