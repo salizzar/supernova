@@ -204,7 +204,7 @@ data "external" "aws-sync" {
   ]
 
   query = {
-    folder                     = "../../website/"
+    folder                     = "../../website/html"
     bucket                     = module.s3-website.id
     profile                    = local.aws_profile
     cloudfront_distribution_id = aws_cloudfront_distribution.s3_distribution.id

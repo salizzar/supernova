@@ -135,9 +135,7 @@ jobs:
       - name: Authenticate into Microsoft Azure
         uses: azure/login@v1
         with:
-          environment: azurerecloud
-          tenant-id: ${{ secrets.TF_VAR_AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.TF_VAR_AZURE_SUBSCRIPTION_ID }}
+          creds: ${{ secrets.AZURE_CREDENTIALS_PAYLOAD }}
 
 #     - name: Authenticate into IBM Cloud
 #       env:
