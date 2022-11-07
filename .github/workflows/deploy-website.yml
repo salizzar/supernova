@@ -11,7 +11,7 @@ jobs:
     environment: ci-${{ github.ref }}
 
     steps:
-      - uses: actions/checkout
+      - uses: actions/checkout@v3
         with:
           fetch-depth: "0"
 
