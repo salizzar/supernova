@@ -38,7 +38,7 @@ jobs:
       - name: Get short SHA and tag
         id: get-short-sha-and-tag
         run: |
-          echo sha=$(echo "${{ github.sha }}" | cut -b 1-7`) >> $GITHUB_OUTPUT$
+          echo sha=$(echo "${{ github.sha }}" | cut -b 1-7 >> $GITHUB_OUTPUT$
           echo tag=$(echo "${{ steps.bump-version.outputs.new_tag }}" | awk -F '-' '{ print $1 }') >> $GITHUB_OUTPUT
 
       - name: Build environment map
