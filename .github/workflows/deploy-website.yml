@@ -11,7 +11,7 @@ jobs:
     environment: ci-${{ github.ref }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout
         with:
           fetch-depth: "0"
 
@@ -38,13 +38,13 @@ jobs:
       - name: Get short SHA and tag
         id: get-short-sha-and-tag
         run: |
-          echo "::set-output name=sha::`echo ${{ github.sha }} | cut -b 1-7`"
-          echo "::aet-output name=tag::`echo ${{ steps.bump-version.outputs.new_tag }} | awk -F '-' '{ print $1 }'`"
+          echo sha=$(echo "${{ github.sha }}" | cut -b 1-7`) >> $GITHUB_OUTPUT$
+          echo tag=$(echo "${{ steps.bump-version.outputs.new_tag }}" | awk -F '-' '{ print $1 }') >> $GITHUB_OUTPUT
 
       - name: Build environment map
         id: build-environment-json
         run: |
-          echo "::set-output name=map::`echo '{\"environments\":{\"main\":\"production\",\"dev\":\"development\"}}'`"
+          echo map='{\"environments\":{\"main\":\"production\",\"dev\":\"development\"}}' >> $GITHUB_OUTPUT
 
       - name: Get environment json map
         run: |
@@ -53,12 +53,12 @@ jobs:
       - name: Get environment branch
         id: get-current
         run: |
-          echo "::set-output name=branch::${{github.ref_name}}"
+          echo branch=${{ github.ref_name }} >> $GITHUB_OUTPUT
 
       - name: Get environment name based on map
         id: get-environment
         run: |
-          echo "::set-output name=name::`echo '${{ steps.build-environment-json.outputs.map }}' | jq -r .environments.${{ steps.get-current.outputs.branch }}`"
+          echo name=$(echo "${{ steps.build-environment-json.outputs.map }}" | jq -r ".environments.${{ steps.get-current.outputs.branch }}") >> $GITHUB_OUPUT
 
       - name: Validate Terraform
         env:
@@ -145,13 +145,16 @@ jobs:
 
       - name: Trigger deployment
         env:
+          # aws
           AWS_ACCESS_KEY_ID: ${{ secrets.MPC_GH_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.MPC_GH_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.MPC_GH_AWS_DEFAULT_REGION }}
 
+          # azure
           TF_VAR_AZURE_TENANT_ID: ${{ secrets.TF_VAR_AZURE_TENANT_ID }}
           TF_VAR_AZURE_SUBSCRIPTION_ID: ${{ secrets.TF_VAR_AZURE_SUBSCRIPTION_ID }}
 
+          # ibm
           IC_API_KEY: ${{ secrets.IC_API_KEY }}
           IAAS_CLASSIC_USERNAME: ${{ secrets.IAAS_CLASSIC_USERNAME }}
           IAAS_CLASSIC_API_KEY: ${{ secrets.IAAS_CLASSIC_API_KEY }}
