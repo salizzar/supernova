@@ -58,7 +58,7 @@ jobs:
       - name: Get environment name based on map
         id: get-environment
         run: |
-          echo name=$(echo "${{ steps.build-environment-json.outputs.map }}" | jq -r ".environments.${{ steps.get-current.outputs.branch }}") >> $GITHUB_OUPUT
+          echo name=$(echo "${{ steps.build-environment-json.outputs.map }}" | jq -r ".environments.${{ steps.get-current.outputs.branch }}") >> $GITHUB_OUTPUT
 
       - name: Validate Terraform
         env:
