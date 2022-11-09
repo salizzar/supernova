@@ -1,7 +1,10 @@
 provider "azurerm" {
-  # tenant_id = var.AZURE_TENANT_ID
-
   features {}
+
+  subscription_id = var.AZURE_SUBSCRIPTTION_ID
+  client_id       = var.AZURE_CLIENT_ID
+  client_secret   = var.AZURE_CLIENT_SECRET
+  tenant_id       = var.AZURE_TENANT_ID
 }
 
 resource "azurerm_resource_group" "rg" {
