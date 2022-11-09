@@ -151,6 +151,8 @@ jobs:
           AWS_DEFAULT_REGION: ${{ secrets.MPC_GH_AWS_DEFAULT_REGION }}
 
           # azure
+          TF_VAR_AZURE_CLIENT_ID: ${{ secrets.TF_VAR_AZURE_CLIENT_ID }}
+          TF_VAR_AZURE_CLIENT_SECRET: ${{ secrets.TF_VAR_AZURE_CLIENT_SECRET }}
           TF_VAR_AZURE_TENANT_ID: ${{ secrets.TF_VAR_AZURE_TENANT_ID }}
           TF_VAR_AZURE_SUBSCRIPTION_ID: ${{ secrets.TF_VAR_AZURE_SUBSCRIPTION_ID }}
 
