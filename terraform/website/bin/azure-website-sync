@@ -9,13 +9,13 @@ AZURE_RESOURCE_GROUP=`echo $QUERY | jq -r .resource_group`
 AZURE_CDN_ENDPOINT=`echo $QUERY | jq -r .cdn_endpoint`
 STORAGE_CONTAINER_URL=`echo $QUERY | jq -r .storage_container_url`
 
-AZURE_AZCOPY_LOGIN_OUTPUT=`azcopy login --tenant-id ${TENANT_ID}`
-AZURE_AZCOPY_EXIT_CODE=$?
-
-if [[ "${AZURE_AZCOPY_EXIT_CODE}" != "0" ]] ; then
-  echo "{\"error\": \"${AZURE_AZCOPY_EXIT_CODE}\", \"reason\": \"${AZURE_AZCOPY_LOGIN_OUTPUT}\"}"
-  exit 1
-fi
+#AZURE_AZCOPY_LOGIN_OUTPUT=`azcopy login --identity`
+#AZURE_AZCOPY_EXIT_CODE=$?
+#
+#if [[ "${AZURE_AZCOPY_EXIT_CODE}" != "0" ]] ; then
+#  echo "{\"error\": \"${AZURE_AZCOPY_EXIT_CODE}\", \"reason\": \"${AZURE_AZCOPY_LOGIN_OUTPUT}\"}"
+#  exit 1
+#fi
 
 AZURE_SYNC_CMD="azcopy sync . ${STORAGE_CONTAINER_URL} --recursive --exclude-pattern \"*\" --include index.html --include 404.html --include images --include styles"
 AZURE_STORAGE_SYNCHRONIZATION_OUTPUT=`cd ${FOLDER} && ${AZURE_SYNC_CMD}`
