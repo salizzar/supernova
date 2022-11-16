@@ -206,10 +206,9 @@ data "external" "azure-sync" {
 
   query = {
     folder                = "../../website/html"
-    tenant_id             = var.AZURE_TENANT_ID
     resource_group        = azurerm_resource_group.rg.name
     cdn_endpoint          = azurerm_cdn_endpoint.website.id
-    storage_container_url = "${azurerm_storage_account.website.primary_web_endpoint}/$web"
+    storage_container_url = "${azurerm_storage_account.website.primary_web_endpoint}/\\$web" # hack to azcopy proper handle folder name with azcopy in background
   }
 }
 
