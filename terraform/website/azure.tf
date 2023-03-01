@@ -11,11 +11,11 @@ resource "azurerm_resource_group" "rg" {
   name     = local.domain
   location = "East US 2"
 }
-
-resource "azurerm_subscription" "subscription" {
-  subscription_name = "Azure subscription"
-  subscription_id   = var.AZURE_SUBSCRIPTION_ID
-}
+#
+#resource "azurerm_subscription" "subscription" {
+#  subscription_name = "Pay-As-You-Go"
+#  subscription_id   = var.AZURE_SUBSCRIPTION_ID
+#}
 
 data "azuread_client_config" "current" {}
 
@@ -208,7 +208,7 @@ data "external" "azure-sync" {
     folder                = "../../website/html"
     resource_group        = azurerm_resource_group.rg.name
     cdn_endpoint          = azurerm_cdn_endpoint.website.id
-    storage_container_url = "${azurerm_storage_account.website.primary_web_endpoint}/\\$web" # hack to azcopy proper handle folder name with azcopy in background
+    storage_container_url = "https://${azurerm_storage_account.website.primary_blob_host}/$web" # hack to azcopy proper handle folder name with azcopy in background
   }
 }
 
