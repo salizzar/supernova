@@ -132,10 +132,10 @@ jobs:
           aws configure set aws_secret_access_key ${{ secrets.MPC_GH_AWS_SECRET_ACCESS_KEY }} --profile marcelopinheiro-co-${{ steps.get-environment.outputs.name }}
           aws configure set region ${{ secrets.MPC_GH_AWS_DEFAULT_REGION }} --profile marcelopinheiro-co-${{ steps.get-environment.outputs.name }}
 
-#     - name: Authenticate into Microsoft Azure
-#       uses: azure/login@v1
-#       with:
-#         creds: ${{ secrets.AZURE_CREDENTIALS_PAYLOAD }}
+      - name: Authenticate into Microsoft Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_PAYLOAD }}
 
 #     - name: Authenticate into IBM Cloud
 #       env:
