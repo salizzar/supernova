@@ -156,6 +156,13 @@ jobs:
           TF_VAR_AZURE_TENANT_ID: ${{ secrets.TF_VAR_AZURE_TENANT_ID }}
           TF_VAR_AZURE_SUBSCRIPTION_ID: ${{ secrets.TF_VAR_AZURE_SUBSCRIPTION_ID }}
 
+          # azcopy
+          AZCOPY_AUTO_LOGIN_TYPE: ${{ secrets.AZCOPY_AUTO_LOGIN_TYPE }}
+          AZCOPY_TENANT_ID: ${{ secrets.AZCOPY_TENANT_ID }}
+          AZCOPY_ACTIVE_DIRECTORY_ENDPOINT: ${{ secrets.AZCOPY_ACTIVE_DIRECTORY_ENDPOINT }}
+          AZCOPY_SPA_APPLICATION_ID: ${{ secrets.AZCOPY_SPA_APPLICATION_ID }}
+          AZCOPY_SPA_CLIENT_SECRET: ${{ secrets.AZCOPY_SPA_CLIENT_SECRET }}
+
           # ibm
           IC_API_KEY: ${{ secrets.IC_API_KEY }}
           IAAS_CLASSIC_USERNAME: ${{ secrets.IAAS_CLASSIC_USERNAME }}
