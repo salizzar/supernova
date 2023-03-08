@@ -2,7 +2,7 @@
 #tfsec:ignore:aws-s3-enable-bucket-encryption
 #tfsec:ignore:aws-s3-encryption-customer-key
 module "s3-website" {
-  source = "git::ssh://git@github.com/salizzar/terraform-modules.git//aws/s3-bucket?ref=v1.0.8"
+  source = "git::ssh://git@github.com/salizzar/terraform-modules.git//aws/s3-bucket?ref=v1.0.9"
 
   aws_iam_policy_document = {
     statement_allow_access_key_administrators = ["*"]
@@ -25,21 +25,32 @@ module "s3-website" {
 
   aws_s3_bucket = {
     bucket = local.domain
-    acl    = "private"
-
-    versioning = {
-      enabled = true
-    }
-
-    website = {
-      index_document           = "index.html"
-      error_document           = "404.html"
-      redirect_all_requests_to = null
-      routing_rules            = null
-    }
-
-    tags = {}
+    tags   = null
   }
+
+  aws_s3_bucket_acl = {
+    acl = "private"
+  }
+
+  aws_s3_bucket_versioning = {
+    versioning_configuration = {
+      status = "Enabled"
+    }
+  }
+
+  aws_s3_bucket_website_configuration = {
+    index_document = {
+      suffix = "index.html"
+    }
+
+    error_document = {
+      suffix = "404.html"
+    }
+
+    redirect_all_requests_to = null
+    routing_rules            = null
+  }
+
 
   aws_s3_bucket_server_side_encryption_configuration = {
     enabled = false
@@ -81,15 +92,14 @@ POLICY
   }
 
   aws_s3_log_bucket = {
-    enabled    = false
-    bucket     = null
-    acl        = null
-    versioning = null
+    enabled = false
+    bucket  = null
+    tags    = null
   }
 
-  aws_s3_bucket_logging = {
-    target_prefix = "marcelopinheiro-co-s3-logs/"
-  }
+  aws_s3_log_bucket_acl        = null
+  aws_s3_log_bucket_versioning = null
+  aws_s3_bucket_logging        = null
 
   aws_dynamodb_table = {
     enabled        = false
