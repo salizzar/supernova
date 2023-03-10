@@ -132,10 +132,6 @@ resource "azurerm_cdn_endpoint_custom_domain" "website" {
   }
 }
 
-output "azurerm_cdn_endpoint_fqdn" {
-  value = azurerm_cdn_endpoint.website.fqdn
-}
-
 resource "azurerm_dns_zone" "website" {
   name                = local.domain
   resource_group_name = azurerm_resource_group.rg.name
@@ -185,10 +181,6 @@ resource "azurerm_dns_cname_record" "asverify" {
   record              = "asverify.${local.sanitized_primary_web_endpoint}"
 }
 
-output "azurerm_dns_zone_nameservers" {
-  value = azurerm_dns_zone.website.name_servers
-}
-
 data "azurerm_subscription" "primary" {
 }
 
@@ -212,14 +204,14 @@ data "external" "azure-sync" {
   }
 }
 
-output "azurerm_resource_group" {
-  value = azurerm_resource_group.rg.location
-}
-
 output "azuread_application_id" {
   value = azuread_application.app.id
 }
 
 output "azuread_service_principal_application_tenant_id" {
   value = azuread_service_principal.marcelopinheiro.application_tenant_id
+}
+
+output "azure_sync_result" {
+  value = data.external.azure-sync.result
 }

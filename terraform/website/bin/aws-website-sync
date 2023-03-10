@@ -1,5 +1,7 @@
 #! /usr/bin/env bash
 
+set -xe
+
 QUERY=`echo $(</dev/stdin)`
 FOLDER=`echo $QUERY | jq -r .folder`
 BUCKET=`echo $QUERY | jq -r .bucket`
@@ -11,7 +13,7 @@ AWS_S3_SYNCHRONIZATION_OUTPUT=`cd ${FOLDER} && ${AWS_SYNC_CMD}`
 AWS_S3_SYNCHRONIZATION_EXIT_CODE=$?
 
 if [[ "${AWS_S3_SYNCHRONIZATION_EXIT_CODE}" != "0" ]] ; then
-  echo "{\"error\": \"${AWS_S3_SYNCHRONIZATION_EXIT_CODE}\", \"reason\": \"${AWS_S3_SYNCHRONIZATION_OUTPUT}\"}"
+  jq --null-input --arg error ${AWS_S3_SYNCHRONIZATION_EXIT_CODE} --arg reason ${AWS_S3_SYNCHRONIZATION_OUTPUT} echo '{"error": $error, "reason": $reason}'
   exit 1
 fi
 
@@ -20,8 +22,10 @@ if [[ "${AWS_S3_SYNCHRONIZATION_OUTPUT}" != "" ]] ; then
   CLOUDFRONT_INVALIDATION_CACHE_EXIT_CODE=$?
 
   if [[ "${CLOUDFRONT_INVALIDATION_CACHE_EXIT_CODE}" != "0" ]] ; then
-    echo "{\"error\": \"${CLOUDFRONT_INVALIDATION_EXIT_CODE}\", \"reason\": \"${CLOUDFRONT_INVALIDATION_CACHE_OUTPUT}\"}"
+    jq --null-input arg error ${CLOUDFRONT_INVALIDATION_EXIT_CODE} --arg reason ${CLOUDFRONT_INVALIDATION_CACHE_OUTPUT} '{"error": $error, "reason": $reason}'
+    exit 1
   fi
 fi
 
-echo '{"result":"ok"}'
+jq --null-input --arg output $CLOUDFRONT_INVALIDATION_CACHE_OUTPUT '{"result":"ok", "output": $output}'
+

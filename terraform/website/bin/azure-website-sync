@@ -13,18 +13,18 @@ AZURE_STORAGE_SYNCHRONIZATION_OUTPUT=`cd ${FOLDER} && ${AZURE_SYNC_CMD}`
 AZURE_STORAGE_SYNCHRONIZATION_EXIT_CODE=$?
 
 if [[ "${AZURE_STORAGE_SYNCHRONIZATION_EXIT_CODE}" != "0" ]] ; then
-  echo "{\"error\": \"${AZURE_STORAGE_SYNCHRONIZATION_EXIT_CODE}\", \"reason\": \"${AZURE_STORAGE_SYNCHRONIZATION_OUTPUT}\"}"
+  jq --null-input --arg error ${AZURE_STORAGE_SYNCHRONIZATION_EXIT_CODE} --arg reason ${AZURE_STORAGE_SYNCHRONIZATION_OUTPUT} '{"error": $error, "reason": $reason}'
   exit 1
 fi
 
-if [[ "${S3_SYNCHRONIZATION_OUTPUT}" != "" ]] ; then
-  CLOUDFRONT_INVALIDATION_CACHE_OUTPUT=`az cdn endpoint purge -g ${AZURE_RESOURCE_GROUP} -n ${AZURE_CDN_ENDPOINT} --content-paths '/*'`
-  CLOUDFRONT_INVALIDATION_CACHE_EXIT_CODE=$?
+if [[ "${AZCOPY_SYNC_CMD}" != "" ]] ; then
+  AZURE_INVALIDATION_CACHE_OUTPUT=`az cdn endpoint purge -g ${AZURE_RESOURCE_GROUP} -n ${AZURE_CDN_ENDPOINT} --content-paths '/*'`
+  AZURE_INVALIDATION_CACHE_EXIT_CODE=$?
 
-  if [[ "${CLOUDFRONT_INVALIDATION_CACHE_EXIT_CODE}" != "0" ]] ; then
-    echo "{\"error\": \"${CLOUDFRONT_INVALIDATION_EXIT_CODE}\", \"reason\": \"${CLOUDFRONT_INVALIDATION_CACHE_OUTPUT}\"}"
+  if [[ "${AZURE_INVALIDATION_CACHE_EXIT_CODE}" != "0" ]] ; then
+    jq --null-input --arg error ${AZURE_INVALIDATION_EXIT_CODE} --arg reason ${AZURE_INVALIDATION_CACHE_OUTPUT} echo '{"error": $error, "reason": $reason}'
+    exit 1
   fi
 fi
 
-echo '{"result":"ok"}'
-
+jq --null-input --arg output $AZURE_INVALIDATION_CACHE_OUTPUT '{"result":"ok", "output": $output}'

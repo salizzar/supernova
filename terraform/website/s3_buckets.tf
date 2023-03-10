@@ -126,10 +126,6 @@ resource "aws_route53_zone" "main" {
   name = local.domain
 }
 
-output "aws_route53_zone_id" {
-  value = aws_route53_zone.main.id
-}
-
 # TODO: work in this paraphernalia in the future
 #module "s3-website-cf-logs" {
 #  # source = "git::ssh://git@github.com/salizzar/terraform-modules.git//aws/s3-bucket?ref=v1.0.8"

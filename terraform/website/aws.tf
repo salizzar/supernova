@@ -211,3 +211,6 @@ data "external" "aws-sync" {
   }
 }
 
+output "aws_sync_result" {
+  value = data.external.aws-sync.result
+}
