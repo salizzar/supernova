@@ -8,7 +8,7 @@ BUCKET=`echo $QUERY | jq -r .bucket`
 PROFILE=`echo $QUERY | jq -r .profile`
 CLOUDFRONT_DISTRIBUTION_ID=`echo $QUERY | jq -r .cloudfront_distribution_id`
 
-AWS_SYNC_CMD="aws s3 sync --delete . s3://${BUCKET} --exclude \"*\" --include index.html --include 404.html --include images --include styles --profile ${PROFILE}"
+AWS_SYNC_CMD="aws s3 sync --delete . s3://${BUCKET} --exclude \".*\" --include index.html --include 404.html --include images --include styles --profile ${PROFILE}"
 AWS_S3_SYNCHRONIZATION_OUTPUT=`cd ${FOLDER} && ${AWS_SYNC_CMD}`
 AWS_S3_SYNCHRONIZATION_EXIT_CODE=$?
 
@@ -27,5 +27,5 @@ if [[ "${AWS_S3_SYNCHRONIZATION_OUTPUT}" != "" ]] ; then
   fi
 fi
 
-jq --null-input --arg sync $AWS_S3_SYNCHRONIZATION_OUTPUT --arg cache $CLOUDFRONT_INVALIDATION_CACHE_OUTPUT '{"result":"ok", "sync": $sync, "cache": $cache}'
+jq --null-input --arg sync "$AWS_S3_SYNCHRONIZATION_OUTPUT" --arg cache "$CLOUDFRONT_INVALIDATION_CACHE_OUTPUT" '{"result": "ok", "sync": $sync, "cache": $cache}'
 
