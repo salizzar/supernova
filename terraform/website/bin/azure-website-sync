@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-set -xe
+set -e
 
 QUERY=`echo $(</dev/stdin)`
 FOLDER=`echo $QUERY | jq -r .folder`
@@ -27,4 +27,4 @@ if [[ "${AZCOPY_SYNC_CMD}" != "" ]] ; then
   fi
 fi
 
-jq --null-input --arg output $AZURE_INVALIDATION_CACHE_OUTPUT '{"result":"ok", "output": $output}'
+jq --null-input --arg sync $AZURE_STORAGE_SYNCHRONIZATION_OUTPUT --arg cache $AZURE_INVALIDATION_CACHE_OUTPUT '{"result":"ok", "sync": $sync, "cache": $cache}'
