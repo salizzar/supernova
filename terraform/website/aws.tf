@@ -43,7 +43,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     module.acm,
     aws_cloudfront_origin_access_identity.oai,
     module.s3-website,
-    aws_wafv2_web_acl.waf
+    #   aws_wafv2_web_acl.waf
   ]
 
   origin {
@@ -59,7 +59,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   is_ipv6_enabled     = true
   comment             = "Marcelo Pinheiro"
   default_root_object = "index.html"
-  web_acl_id          = aws_wafv2_web_acl.waf.arn
+  # web_acl_id          = aws_wafv2_web_acl.waf.arn
 
   # TODO: enable this paraphernalia in the future
   #logging_config {
@@ -157,20 +157,20 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   }
 }
 
-resource "aws_wafv2_web_acl" "waf" {
-  name  = "${local.domain_with_underscore}_waf"
-  scope = "CLOUDFRONT"
-
-  default_action {
-    allow {}
-  }
-
-  visibility_config {
-    cloudwatch_metrics_enabled = true
-    metric_name                = "${local.domain_with_underscore}_waf"
-    sampled_requests_enabled   = true
-  }
-}
+#resource "aws_wafv2_web_acl" "waf" {
+#  name  = "${local.domain_with_underscore}_waf"
+#  scope = "CLOUDFRONT"
+#
+#  default_action {
+#    allow {}
+#  }
+#
+#  visibility_config {
+#    cloudwatch_metrics_enabled = true
+#    metric_name                = "${local.domain_with_underscore}_waf"
+#    sampled_requests_enabled   = true
+#  }
+#}
 
 resource "aws_route53_record" "cloudfront" {
   zone_id = aws_route53_zone.main.id
