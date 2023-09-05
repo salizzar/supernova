@@ -2,7 +2,6 @@ locals {
   aws_profile            = var.aws_profile
   aws_region             = var.aws_region
   domain                 = var.domain
-  aws_kms_key_name       = var.aws_kms_key.name
   domain_with_underscore = replace(local.domain, ".", "_")
   domain_with_dash       = replace(local.domain, ".", "-")
   domain_without_dot     = replace(local.domain, ".", "")
