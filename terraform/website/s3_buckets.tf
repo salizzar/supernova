@@ -9,18 +9,11 @@ module "s3-website" {
   }
 
   aws_kms_key = {
-    enabled = true
-
-    description             = "Marcelo Pinheiro Website KMS Key"
-    deletion_window_in_days = 7
-    enable_key_rotation     = true
-    tags                    = null
+    enabled = false
   }
 
   aws_kms_alias = {
-    enabled = true
-
-    name = var.aws_kms_alias.name
+    enabled = false
   }
 
   aws_s3_bucket = {
