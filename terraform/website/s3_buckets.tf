@@ -10,10 +10,17 @@ module "s3-website" {
 
   aws_kms_key = {
     enabled = false
+
+    description             = null
+    policy                  = null
+    deletion_window_in_days = null
+    enable_key_rotation     = null
+    tags                    = null
   }
 
   aws_kms_alias = {
     enabled = false
+    name    = null
   }
 
   aws_s3_bucket = {
