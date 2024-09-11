@@ -1,0 +1,29 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.25.1
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  'npm:hoek:20180212':
+    - phantomjs-prebuilt-that-works > request > hawk > hoek:
+        patched: '2024-09-11T10:25:12.964Z'
+        id: 'npm:hoek:20180212'
+        path: phantomjs-prebuilt-that-works > request > hawk > hoek
+    - phantomjs-prebuilt-that-works > request > hawk > boom > hoek:
+        patched: '2024-09-11T10:25:12.964Z'
+        id: 'npm:hoek:20180212'
+        path: phantomjs-prebuilt-that-works > request > hawk > boom > hoek
+    - phantomjs-prebuilt-that-works > request > hawk > sntp > hoek:
+        patched: '2024-09-11T10:25:12.964Z'
+        id: 'npm:hoek:20180212'
+        path: phantomjs-prebuilt-that-works > request > hawk > sntp > hoek
+    - phantomjs-prebuilt-that-works > request > hawk > cryptiles > boom > hoek:
+        patched: '2024-09-11T10:25:12.964Z'
+        id: 'npm:hoek:20180212'
+        path: >-
+          phantomjs-prebuilt-that-works > request > hawk > cryptiles > boom >
+          hoek
+  'npm:tunnel-agent:20170305':
+    - phantomjs-prebuilt-that-works > request > tunnel-agent:
+        patched: '2024-09-11T10:25:12.964Z'
+        id: 'npm:tunnel-agent:20170305'
+        path: phantomjs-prebuilt-that-works > request > tunnel-agent

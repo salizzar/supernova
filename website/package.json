@@ -12,12 +12,16 @@
     "hawk": "^9.0.1",
     "minimist": "^1.2.6",
     "nth-check": "^2.1.1",
-    "concat-stream": "^2.0.0"
+    "concat-stream": "^2.0.0",
+    "@snyk/protect": "latest"
   },
   "type": "module",
   "scripts": {
     "test": "html-lint --strict --verbose index.html",
-    "generate-badgets": "bash bin/generate-badgets"
+    "generate-badgets": "bash bin/generate-badgets",
+    "prepublish": "npm run snyk-protect",
+    "snyk-protect": "snyk-protect"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "snyk": true
 }
